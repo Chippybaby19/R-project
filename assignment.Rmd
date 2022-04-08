@@ -1,0 +1,191 @@
+---
+title: "Assignment 2 – Data Analysis using R Programming"
+header-includes:
+- \usepackage{fancyhdr}
+- \usepackage{lipsum}
+- \pagestyle{fancy}
+- \fancyhead[CO,CE]{Assignment 2 – Data Analysis using R Programming}
+- \fancyfoot[CO,CE]{github - https://github.com/Chippybaby19/R-project}
+- \fancyfoot[LE,RO]{\thepage}
+
+
+output: pdf_document
+date: '2022-04-08'
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Datasets
+Using UScereal Dataset from the library Mass
+
+```{r UScereal}
+library(MASS)
+??UScereal
+```
+## R Datasets
+Creating a new dataframe
+
+```{r UScereal1}
+UScereal1 <- UScereal
+```
+
+Printing the Structure of the dataset
+```{r UScereal1_}
+str(UScereal1)
+```
+
+Listing the variables inside the dataset
+```{r Usc_2}
+names(UScereal1)
+```
+
+Printing top 15 rows of the dataset
+```{r Usc_3}
+head(UScereal1, 15)
+```
+
+User defined function for one variable Finding the average of any given variable
+```{r Usc_4}
+ave<-function(x){ mn<-mean(x)
+return(mn) }
+ave(UScereal1$potassium)
+```
+
+Use data manipulation techniques and filter rows based on any logical criteria that exist in your dataset. Filtering for any manufacturer
+```{r Usc_5}
+manu1 <- UScereal1[UScereal1$mfr=='K',]
+head(manu1)
+```
+
+Identify the dependent & independent variables and use reshaping techniques and create a new data frame by joining those variables from your dataset.
+```{r Usc_6}
+library(tidyr)
+UScereal_long <- gather(UScereal1, market_info, value, calories:vitamins, factor_key=TRUE)
+```
+
+```{r Usc_7}
+UScereal_long
+```
+
+Remove missingvalues in your dataset.
+```{r Usc_8}
+ library(ggplot2)
+remove_missing(UScereal1, na.rm = FALSE, vars = names(UScereal1), name = "", finite = FALSE)
+```
+
+Identify and remove duplicated data in your dataset
+```{r Usc_9}
+UScereal1[!duplicated(UScereal1), ]
+```
+
+Reorder multiple rows in descending order
+```{r Usc_10}
+library(dplyr)
+UScereal1 %>% arrange(mfr, shelf)
+```
+
+Rename some of the column names in your dataset
+```{r Usc_11}
+names(UScereal1)[names(UScereal1)=="calories"] <- "calorie_content"
+names(UScereal1)[names(UScereal1)=="mfr"] <- "Manufacturer"
+head(UScereal1)
+```
+
+Add new variables in your data frame by using a mathematical function (for e.g. – multiply an existing column by 2 and add it as a new variable to your data frame)
+
+```{r Usc_12}
+#Finding Kilocalories
+UScereal1 %>%
+  mutate(Kilocalories = calorie_content/1000)
+```
+
+Create a training set using random number generator engine.
+```{r Usc_13}
+ RandomNum <- runif(50, 1, 250)
+RandomNum
+```
+
+
+Print the summary statistics of your dataset
+```{r Usc_14}
+summary(UScereal1)
+```
+
+Use any of the numerical variables from the dataset and perform the following statistical functions • Mean • Median • Mode • Range
+```{r Usc_15}
+ #Mean function
+calorie_mean<-mean(UScereal1$calorie_content, na.rm=TRUE)
+print(calorie_mean)
+```
+
+```{r Usc_16}
+#Median function
+calorie_median<-median(UScereal1$calorie_content, na.rm=TRUE)
+print(calorie_median)
+```
+
+```{r Usc_17}
+# To find Mode we need to create a function.
+findmode <- function(x) {
+mode_value <- unique(x) 
+mode_value[which.max(tabulate(match(x, mode_value)))]
+## Calculate the mode using the function.
+calorie_mode <- findmode(UScereal1$calorie_content)
+print(calorie_mode)
+}
+```
+
+```{r Usc_18}
+ #Mean function
+ #To find Range
+calorie_range <- max(UScereal1$calorie_content, na.rm=TRUE) - min(UScereal1$calorie_content, na.rm=TRUE)
+print(calorie_range)
+```
+
+## Scatter Plot
+Plot a scatter plot for any 2 variables in your dataset
+```{r Usc_19}
+ #Mean function
+ plot(UScereal1$sugars, UScereal1$calorie_content, col='red', pch=19,
+     xlab='Sugars', ylab='Calories', main='Scatterplot of Two Variables')
+```
+
+## Bar Plot
+bar plot for any 2 variables in your dataset
+```{r Usc_20}
+# Add labels to bar plot
+barplot(UScereal1$calorie_content,
+names.arg = UScereal1$Manufacturer,
+main = "Bar Plot of 2 variables",
+xlab = "Manufacturer",
+ylab = 'Calories')
+```
+
+
+## Linear Regression Model
+Find the correlation between any 2 variables by applying least square linear regression model
+```{r Usc_21}
+# Linear Regression Model
+model1 <- lm(UScereal1$calorie_content~UScereal1$sugars)
+yfit<-model1$fitted.values
+plot(UScereal1$sugars, UScereal1$calorie_content, xlab='Sugar', ylab='Calories', 
+main='Calorie Content based on Sugars')
+lines(UScereal1$sugars, yfit)
+```
+
+## Residual Plot
+```{r Usc_22}
+#residual plot
+residuals <- UScereal1$calorie_content - yfit
+plot(UScereal1$sugars, residuals, xlab='Sugar', ylab='Residuals', main='Residual Plot')
+```
+
+```{r Usc_23}
+#Correlation
+cor(UScereal1$sugars, UScereal1$calorie_content)
+```
+
+
+
